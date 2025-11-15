@@ -325,3 +325,20 @@ CSSï¼šTailwind ã®ãƒ¦ãƒ¼ãƒ†ã‚£ãƒªãƒ†ã‚£ã®ã¿ã€‚ã‚«ã‚¹ã‚¿ãƒ  CSS ã¯ globals.css
 
 ã“ã®ã‚»ãƒƒãƒˆã§ ã€Œåˆ¤æ–­ãªã—ã« codeX ã‚’ãƒ‰ãƒ©ã‚¤ãƒ–ã€ ã§ãã‚‹ã€‚
 ãƒ•ãƒ­ãƒ³ãƒˆãŒå½¢ã«ãªã£ãŸã‚‰ã€Streamlit å´ã® â€œåŒæ§˜ã®å›ºå®šãƒ—ãƒ­ãƒ³ãƒ—ãƒˆâ€ ã‚‚ç”¨æ„ã§ãã‚‹ã€‚æ¬¡ã¯ Analyst å‘ã‘ã®è¨ˆæ¸¬ãƒ“ãƒ¥ãƒ¼ï¼ˆæ›œæ—¥Ã—æ™‚é–“å¸¯ãƒ’ãƒ¼ãƒˆãƒãƒƒãƒ—ç­‰ï¼‰ã®ä»•æ§˜ã‚’åŒã˜ã‚¹ã‚¿ã‚¤ãƒ«ã§å›ºã‚ã‚ˆã†ã€‚
+### API ƒGƒ‰[Œ`®
+‘S‚Ä‚ÌƒGƒ‰[ƒŒƒXƒ|ƒ“ƒX‚ÍŸ‚Ì JSON Œ`®‚É‘µ‚¦‚éB
+```json
+{
+  "error": {
+    "code": 400,
+    "message": "ƒ`ƒƒƒ“ƒlƒ‹URL‚Ü‚½‚ÍID‚ğ“ü—Í‚µ‚Ä‚­‚¾‚³‚¢B"
+  }
+}
+```
+ƒtƒƒ“ƒg‘¤‚Í `error.message` ‚ğƒg[ƒXƒg•\¦A`error.code` ‚Å’Ç‰Áƒnƒ“ƒhƒŠƒ“ƒO‚ğs‚¤B
+
+### ƒ\[ƒgƒL[ˆê——
+- `/channels`: `title`, `subscriberCount`, `viewCount`, `videoCount`
+- `/channels/{id}/videos`: `publishedAt`, `viewCount`, `likeCount`, `commentCount`
+
+`sort=column:asc|desc` Œ`®‚Åw’è‚µA–¢w’è‚Í `publishedAt:desc` ‚ğƒfƒtƒHƒ‹ƒg‚Æ‚·‚éB
