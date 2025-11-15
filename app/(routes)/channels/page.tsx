@@ -1,42 +1,19 @@
 import Link from "next/link";
 
-type Channel = {
-  id: string;
-  name: string;
-  subscribers: string;
-  totalViews: string;
-  videos: number;
-  lastFetched: string;
-};
+import { getChannels } from "@/lib/api";
+import { formatChannelListItem } from "@/utils/format";
+import type { ChannelListItem } from "@/types/channel";
 
-const mockChannels: Channel[] = [
-  {
-    id: "demo",
-    name: "YouTube Demo Channel",
-    subscribers: "245K",
-    totalViews: "12.4M",
-    videos: 486,
-    lastFetched: "11/15 09:45",
-  },
-  {
-    id: "weekly-vlog",
-    name: "週末VLOGまとめ",
-    subscribers: "89K",
-    totalViews: "2.1M",
-    videos: 120,
-    lastFetched: "11/14 23:12",
-  },
-  {
-    id: "live-digest",
-    name: "ライブ配信ダイジェスト",
-    subscribers: "32K",
-    totalViews: "860K",
-    videos: 54,
-    lastFetched: "11/13 18:02",
-  },
-];
+export default async function ChannelsPage() {
+  let channels: ChannelListItem[] = [];
+  let error: string | null = null;
 
-export default function ChannelsPage() {
+  try {
+    const response = await getChannels();
+    channels = response.items.map(formatChannelListItem);
+  } catch (err) {
+    error = err instanceof Error ? err.message : "チャンネル一覧の取得に失敗しました";
+  }
   return (
     <div className="space-y-8">
       <header className="space-y-3">
@@ -63,46 +40,56 @@ export default function ChannelsPage() {
       </header>
 
       <section className="rounded-2xl border border-gray-100 bg-white shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-100 text-sm">
-            <thead className="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-              <tr>
-                <th className="px-4 py-3">チャンネル</th>
-                <th className="px-4 py-3">登録者数</th>
-                <th className="px-4 py-3">総再生回数</th>
-                <th className="px-4 py-3">動画数</th>
-                <th className="px-4 py-3">最終取得</th>
-                <th className="px-4 py-3"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 bg-white text-gray-700">
-              {mockChannels.map((channel) => (
-                <tr key={channel.id} className="transition hover:bg-gray-50">
-                  <td className="px-4 py-3">
-                    <Link
-                      href={`/channels/${channel.id}`}
-                      className="font-semibold text-gray-900 transition hover:text-youtube-red"
-                    >
-                      {channel.name}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3">{channel.subscribers}</td>
-                  <td className="px-4 py-3">{channel.totalViews}</td>
-                  <td className="px-4 py-3">{channel.videos}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500">{channel.lastFetched}</td>
-                  <td className="px-4 py-3 text-right">
-                    <Link
-                      href={`/channels/${channel.id}/videos`}
-                      className="text-sm font-semibold text-youtube-red transition hover:text-red-600"
-                    >
-                      動画一覧
-                    </Link>
-                  </td>
+        {error ? (
+          <div className="p-6 text-center">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        ) : channels.length === 0 ? (
+          <div className="p-6 text-center">
+            <p className="text-sm text-gray-500">登録済みのチャンネルがありません</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-100 text-sm">
+              <thead className="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <tr>
+                  <th className="px-4 py-3">チャンネル</th>
+                  <th className="px-4 py-3">登録者数</th>
+                  <th className="px-4 py-3">総再生回数</th>
+                  <th className="px-4 py-3">動画数</th>
+                  <th className="px-4 py-3">最終取得</th>
+                  <th className="px-4 py-3"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-100 bg-white text-gray-700">
+                {channels.map((channel) => (
+                  <tr key={channel.id} className="transition hover:bg-gray-50">
+                    <td className="px-4 py-3">
+                      <Link
+                        href={`/channels/${channel.id}`}
+                        className="font-semibold text-gray-900 transition hover:text-youtube-red"
+                      >
+                        {channel.name}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3">{channel.subscribers}</td>
+                    <td className="px-4 py-3">{channel.totalViews}</td>
+                    <td className="px-4 py-3">{channel.videos}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500">{channel.lastFetched}</td>
+                    <td className="px-4 py-3 text-right">
+                      <Link
+                        href={`/channels/${channel.id}/videos`}
+                        className="text-sm font-semibold text-youtube-red transition hover:text-red-600"
+                      >
+                        動画一覧
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
     </div>
   );

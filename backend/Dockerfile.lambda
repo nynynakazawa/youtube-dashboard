@@ -1,0 +1,27 @@
+FROM --platform=linux/amd64 public.ecr.aws/lambda/python:3.11
+
+# zipコマンドをインストール
+RUN yum install -y zip && yum clean all
+
+# 作業ディレクトリを設定
+WORKDIR /var/task
+
+# 依存関係をインストール
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt -t .
+
+# アプリケーションコードをコピー
+COPY handlers/ ./handlers/
+COPY services/ ./services/
+COPY db/ ./db/
+COPY common/ ./common/
+COPY utils/ ./utils/
+COPY constants/ ./constants/
+
+# ZIPファイルを作成
+RUN zip -r /tmp/lambda-functions.zip . -x "*.pyc" "__pycache__/*" "*.dist-info/*" "*/tests/*" "*/test/*" "*.egg-info/*"
+
+# エントリーポイントをオーバーライドしてZIPファイルを出力
+ENTRYPOINT []
+CMD ["cat", "/tmp/lambda-functions.zip"]
+
