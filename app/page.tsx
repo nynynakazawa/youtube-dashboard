@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type Metric = {
   label: string;
   value: string;
@@ -75,9 +77,12 @@ export default function Home() {
               <h2 className="text-lg font-semibold text-gray-900">{copy.summaryTitle}</h2>
               <p className="text-sm text-gray-500">{copy.summaryLead}</p>
             </div>
-            <button className="rounded-full border border-gray-200 px-4 py-2 text-xs font-semibold text-gray-700 transition hover:border-youtube-red hover:text-youtube-red">
+            <Link
+              href="/channels/demo"
+              className="rounded-full border border-gray-200 px-4 py-2 text-xs font-semibold text-gray-700 transition hover:border-youtube-red hover:text-youtube-red"
+            >
               {copy.summaryButton}
-            </button>
+            </Link>
           </div>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <div className="rounded-xl border border-gray-100 p-4">
@@ -129,9 +134,12 @@ export default function Home() {
               <p className="text-gray-500">{copy.activityReportDesc}</p>
             </li>
           </ul>
-          <button className="mt-6 w-full rounded-xl bg-youtube-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-600">
+          <Link
+            href="/channels"
+            className="mt-6 flex w-full items-center justify-center rounded-xl bg-youtube-red px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-600"
+          >
             {copy.notificationsButton}
-          </button>
+          </Link>
         </article>
       </section>
     </div>

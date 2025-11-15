@@ -10,8 +10,10 @@ type AppLayoutProps = {
 
 const navItems = [
   { label: "\u30c0\u30c3\u30b7\u30e5\u30dc\u30fc\u30c9", href: "/" },
+  { label: "\u30c1\u30e3\u30f3\u30cd\u30eb\u767b\u9332", href: "/channels/import" },
   { label: "\u30c1\u30e3\u30f3\u30cd\u30eb\u4e00\u89a7", href: "/channels" },
   { label: "\u30a2\u30ca\u30ea\u30c6\u30a3\u30af\u30b9", href: "/channels/demo" },
+  { label: "\u52d5\u753b\u4e00\u89a7", href: "/channels/demo/videos" },
 ];
 
 const copy = {
