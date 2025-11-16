@@ -10,18 +10,675 @@
   --youtube-red: #ff1a1a;
 }
 
+html {
+  height: 100%;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: "Inter", "Noto Sans JP", system-ui, -apple-system, BlinkMacSystemFont,
     "Helvetica Neue", Arial, "Yu Gothic", "Hiragino Kaku Gothic ProN", sans-serif;
   line-height: 1.6;
+  min-height: 100%;
+  position: relative;
+}
+
+/* グラデーション背景をbodyに適用 */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+  z-index: -2;
+  pointer-events: none;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(79, 172, 254, 0.3) 0%, transparent 50%);
+  z-index: -1;
+  pointer-events: none;
 }
 
 .bg-dashboard-surface {
   background-color: var(--background);
 }
 
+/* グラデーション背景（後方互換性のため残す） */
+.gradient-background {
+  position: relative;
+  min-height: 100vh;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 .bg-youtube-red {
   background-color: var(--youtube-red);
+}
+
+/* ガラスモーフィズム（Glassmorphism）スタイル */
+.glass-header {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.7) 0%,
+    rgba(255, 255, 255, 0.5) 100%
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+}
+
+/* ガラスモーフィズム入力フォーム */
+.glass-input-form {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1rem;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 2px 10px 0 rgba(31, 38, 135, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+}
+
+.glass-input-form:focus {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(255, 26, 26, 0.5);
+  box-shadow: 0 4px 20px 0 rgba(255, 26, 26, 0.2),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+  outline: none;
+}
+
+.glass-input-form::placeholder {
+  color: rgba(107, 114, 128, 0.7);
+}
+
+/* 統一されたボタンスタイル（ガラスモーフィズム） */
+.btn-glass {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 10px 0 rgba(31, 38, 135, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-glass:hover {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(255, 26, 26, 0.5);
+  color: #ff1a1a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px 0 rgba(255, 26, 26, 0.2),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+}
+
+.btn-glass:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px 0 rgba(31, 38, 135, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+}
+
+.btn-glass:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 26, 26, 0.3);
+}
+
+/* プライマリボタン（YouTubeレッド） */
+.btn-glass-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, rgba(255, 26, 26, 0.9) 0%, rgba(220, 20, 20, 0.9) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  box-shadow: 0 4px 15px 0 rgba(255, 26, 26, 0.4),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-glass-primary:hover {
+  background: linear-gradient(135deg, rgba(220, 20, 20, 0.95) 0%, rgba(255, 26, 26, 0.95) 100%);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px 0 rgba(255, 26, 26, 0.5),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+}
+
+.btn-glass-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 15px 0 rgba(255, 26, 26, 0.4),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn-glass-primary:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 26, 26, 0.3);
+}
+
+.glass-avatar {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.glass-avatar:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: scale(1.05);
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* ヘッダーナビゲーションリンク */
+.nav-link {
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  transform: translateY(-1px);
+}
+
+/* モダンなカードデザイン（ガラスモーフィズム・コンパクト） */
+.modern-card {
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #697e91;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .modern-card {
+    width: calc(100% - 24px);
+    max-width: calc(100% - 24px);
+    margin: 0 auto 24px auto;
+  }
+}
+
+.modern-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.modern-card .card-inner {
+  align-items: center;
+  padding: 16px;
+  padding-top: 32px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.2) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 12px;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.modern-card .card-pricing {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: linear-gradient(135deg, rgba(190, 214, 251, 0.8) 0%, rgba(142, 168, 220, 0.8) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 0 12px 0 12px;
+  display: flex;
+  align-items: center;
+  padding: 0.375em 0.625em;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #425475;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 15px 0 rgba(31, 38, 135, 0.2);
+}
+
+.modern-card .card-pricing small {
+  color: #707a91;
+  font-size: 0.75em;
+  margin-left: 0.25em;
+}
+
+.modern-card .card-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #425675;
+}
+
+.modern-card .card-title + * {
+  margin-top: 0.75rem;
+}
+
+.modern-card .card-info {
+  color: #697e91;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.modern-card .card-info + * {
+  margin-top: 1rem;
+}
+
+.modern-card .card-features {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.modern-card .card-features li {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+}
+
+.modern-card .card-features li + * {
+  margin-top: 0.5rem;
+}
+
+.modern-card .card-features .icon {
+  background: linear-gradient(135deg, rgba(31, 202, 197, 0.9) 0%, rgba(20, 180, 175, 0.9) 100%);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 8px 0 rgba(31, 202, 197, 0.3);
+}
+
+.modern-card .card-features .icon svg {
+  width: 10px;
+  height: 10px;
+}
+
+.modern-card .card-features + * {
+  margin-top: 0.75rem;
+}
+
+.modern-card .card-action {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  margin-top: 0.75rem;
+}
+
+.modern-card .card-button {
+  background: linear-gradient(135deg, rgba(255, 26, 26, 0.9) 0%, rgba(220, 20, 20, 0.9) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  color: #fff;
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  outline: 0;
+  width: 100%;
+  padding: 0.5em 0.625em;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 4px 15px 0 rgba(255, 26, 26, 0.4),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+}
+
+.modern-card .card-button:hover,
+.modern-card .card-button:focus {
+  background: linear-gradient(135deg, rgba(220, 20, 20, 0.95) 0%, rgba(255, 26, 26, 0.95) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px 0 rgba(255, 26, 26, 0.5),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+}
+
+.modern-card strong {
+  font-weight: 600;
+  color: #425275;
+}
+
+/* メトリクスカード用のスタイル（ガラスモーフィズム・コンパクト） */
+.metric-card {
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #697e91;
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .metric-card {
+    width: calc(100% - 24px);
+    max-width: calc(100% - 24px);
+    margin: 0 auto 16px auto;
+  }
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.metric-card .metric-inner {
+  padding: 16px;
+  padding-top: 32px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.2) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 12px;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.metric-card .metric-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: linear-gradient(135deg, rgba(190, 214, 251, 0.8) 0%, rgba(142, 168, 220, 0.8) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 0 12px 0 12px;
+  display: flex;
+  align-items: center;
+  padding: 0.625em 0.75em;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #425475;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 15px 0 rgba(31, 38, 135, 0.2);
+}
+
+.metric-card .metric-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #697e91;
+  margin-bottom: 0.5rem;
+}
+
+.metric-card .metric-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #425675;
+  margin-top: 0.5rem;
+}
+
+/* チャンネルカード用のスタイル（ガラスモーフィズム・コンパクト） */
+.channel-card {
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #697e91;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .channel-card {
+    width: calc(100% - 24px);
+    max-width: calc(100% - 24px);
+    margin: 0 auto 24px auto;
+  }
+}
+
+.channel-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.channel-card .channel-inner {
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.2) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 12px;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.channel-card .channel-title {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: #425675;
+  margin-bottom: 0.5rem;
+}
+
+.channel-card .channel-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-top: 0.75rem;
+}
+
+.channel-card .channel-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+}
+
+.channel-card .channel-stat strong {
+  font-weight: 600;
+  color: #425275;
+}
+
+/* グリッドレイアウトの強制適用 */
+.grid {
+  display: grid;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.grid > * {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  
+  .md\:grid-cols-2 > * {
+    max-width: 100%;
+    overflow: hidden;
+  }
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .modern-card {
+    max-width: 100%;
+    padding: 12px;
+    margin: 0;
+  }
+
+  .modern-card .card-inner {
+    padding: 12px;
+    padding-top: 28px;
+  }
+
+  .modern-card .card-title {
+    font-size: 0.9375rem;
+  }
+
+  .modern-card .card-pricing {
+    font-size: 0.8125rem;
+    padding: 0.25em 0.5em;
+  }
+
+  .modern-card .card-button {
+    font-size: 0.8125rem;
+    padding: 0.375em 0.5em;
+  }
+
+  .metric-card {
+    padding: 12px;
+  }
+
+  .metric-card .metric-inner {
+    padding: 12px;
+    padding-top: 28px;
+  }
+
+  .metric-card .metric-value {
+    font-size: 1.125rem;
+  }
+
+  .metric-card .metric-badge {
+    font-size: 0.6875rem;
+    padding: 0.25em 0.5em;
+  }
+
+  .channel-card {
+    padding: 12px;
+  }
+
+  .channel-card .channel-inner {
+    padding: 12px;
+  }
+
+  .channel-card .channel-title {
+    font-size: 0.875rem;
+  }
+
+  .channel-card .channel-stat {
+    font-size: 0.6875rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .modern-card {
+    padding: 10px;
+    margin: 0;
+  }
+
+  .modern-card .card-inner {
+    padding: 10px;
+    padding-top: 24px;
+  }
+
+  .modern-card .card-title {
+    font-size: 0.875rem;
+  }
+
+  .modern-card .card-info {
+    font-size: 0.6875rem;
+  }
+
+  .metric-card {
+    padding: 10px;
+  }
+
+  .metric-card .metric-inner {
+    padding: 10px;
+    padding-top: 24px;
+  }
+
+  .metric-card .metric-value {
+    font-size: 1rem;
+  }
+
+  .channel-card {
+    padding: 10px;
+  }
+
+  .channel-card .channel-inner {
+    padding: 10px;
+  }
 }

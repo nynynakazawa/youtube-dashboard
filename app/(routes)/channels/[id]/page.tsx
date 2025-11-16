@@ -65,13 +65,13 @@ export default async function ChannelDetailPage({ params }: PageProps) {
         <div className="flex flex-wrap gap-3">
           <Link
             href={`/channels/${resolvedParams.id}/videos`}
-            className="inline-flex items-center justify-center rounded-full bg-youtube-red px-5 py-2 text-sm font-semibold text-white transition hover:bg-red-600"
+            className="btn-glass-primary"
           >
             動画一覧を開く
           </Link>
           <Link
             href="/channels"
-            className="inline-flex items-center justify-center rounded-full border border-gray-200 px-5 py-2 text-sm font-semibold text-gray-700 transition hover:border-youtube-red hover:text-youtube-red"
+            className="btn-glass"
           >
             チャンネル一覧に戻る
           </Link>
@@ -79,48 +79,60 @@ export default async function ChannelDetailPage({ params }: PageProps) {
       </header>
 
       {error ? (
-        <div className="rounded-2xl border border-red-100 bg-red-50 p-6 text-center">
-          <p className="text-sm text-red-600">{error}</p>
+        <div className="modern-card">
+          <div className="card-inner">
+            <div className="p-6 text-center">
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          </div>
         </div>
       ) : (
-        <section className="grid gap-4 lg:grid-cols-3">
-          {metrics.map((metric) => (
-            <article key={metric.label} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{metric.label}</p>
-              <p className="mt-3 text-2xl font-semibold text-gray-900">{metric.value}</p>
-              {metric.delta !== "-" && (
-                <p className="mt-1 text-xs font-semibold text-emerald-500">{metric.delta}</p>
+        <div className="grid gap-8 grid-cols-1 md:grid-cols-2">
+          <section className="grid gap-6 grid-cols-1">
+            {metrics.map((metric) => (
+              <article key={metric.label} className="metric-card">
+                <div className="metric-inner">
+                  <span className="metric-badge">
+                    {metric.label}
+                  </span>
+                  <p className="metric-value">{metric.value}</p>
+                  {metric.delta !== "-" && (
+                    <p className="mt-2 text-xs font-semibold text-emerald-500">{metric.delta}</p>
+                  )}
+                </div>
+              </article>
+            ))}
+          </section>
+
+          <section className="modern-card">
+            <div className="card-inner">
+              <div className="mb-6">
+                <h2 className="card-title">視聴動向</h2>
+                <p className="card-info">
+                  チャンネルの動画データを可視化しています。
+                </p>
+              </div>
+
+              {videos.length > 0 ? (
+                <div className="space-y-8">
+                  <div>
+                    <h3 className="mb-4 text-base font-semibold text-gray-900">再生数トップ10</h3>
+                    <TopVideosChart videos={videos} />
+                  </div>
+                  <div>
+                    <h3 className="mb-4 text-base font-semibold text-gray-900">月別総再生数推移</h3>
+                    <MonthlyViewsChart videos={videos} />
+                  </div>
+                </div>
+              ) : (
+                <div className="flex h-64 items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50 text-sm text-gray-500">
+                  動画データがありません
+                </div>
               )}
-            </article>
-          ))}
-        </section>
-      )}
-
-      <section className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-900">視聴動向</h2>
-          <p className="mt-1 text-sm text-gray-500">
-            チャンネルの動画データを可視化しています。
-          </p>
+            </div>
+          </section>
         </div>
-
-        {videos.length > 0 ? (
-          <div className="space-y-8">
-            <div>
-              <h3 className="mb-4 text-base font-semibold text-gray-900">再生数トップ10</h3>
-              <TopVideosChart videos={videos} />
-            </div>
-            <div>
-              <h3 className="mb-4 text-base font-semibold text-gray-900">月別総再生数推移</h3>
-              <MonthlyViewsChart videos={videos} />
-            </div>
-          </div>
-        ) : (
-          <div className="flex h-64 items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50 text-sm text-gray-500">
-            動画データがありません
-          </div>
-        )}
-      </section>
+      )}
     </div>
   );
 }

@@ -26,68 +26,90 @@ export default async function ChannelsPage() {
         <div className="flex flex-wrap gap-3">
           <Link
             href="/channels/import"
-            className="inline-flex items-center justify-center rounded-full bg-youtube-red px-5 py-2 text-sm font-semibold text-white transition hover:bg-red-600"
+            className="btn-glass-primary"
           >
             新規チャンネルを取り込む
           </Link>
           <Link
             href="/channels/demo"
-            className="inline-flex items-center justify-center rounded-full border border-gray-200 px-5 py-2 text-sm font-semibold text-gray-700 transition hover:border-youtube-red hover:text-youtube-red"
+            className="btn-glass"
           >
             デモチャンネルを表示
           </Link>
         </div>
       </header>
 
-      <section className="rounded-2xl border border-gray-100 bg-white shadow-sm">
+      <section>
         {error ? (
-          <div className="p-6 text-center">
-            <p className="text-sm text-red-600">{error}</p>
+          <div className="modern-card">
+            <div className="card-inner">
+              <div className="p-6 text-center">
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+            </div>
           </div>
         ) : channels.length === 0 ? (
-          <div className="p-6 text-center">
-            <p className="text-sm text-gray-500">登録済みのチャンネルがありません</p>
+          <div className="modern-card">
+            <div className="card-inner">
+              <div className="p-6 text-center">
+                <p className="text-sm text-gray-500">登録済みのチャンネルがありません</p>
+              </div>
+            </div>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-100 text-sm">
-              <thead className="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                <tr>
-                  <th className="px-4 py-3">チャンネル</th>
-                  <th className="px-4 py-3">登録者数</th>
-                  <th className="px-4 py-3">総再生回数</th>
-                  <th className="px-4 py-3">動画数</th>
-                  <th className="px-4 py-3">最終取得</th>
-                  <th className="px-4 py-3"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 bg-white text-gray-700">
-                {channels.map((channel) => (
-                  <tr key={channel.id} className="transition hover:bg-gray-50">
-                    <td className="px-4 py-3">
-                      <Link
-                        href={`/channels/${channel.id}`}
-                        className="font-semibold text-gray-900 transition hover:text-youtube-red"
-                      >
-                        {channel.name}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3">{channel.subscribers}</td>
-                    <td className="px-4 py-3">{channel.totalViews}</td>
-                    <td className="px-4 py-3">{channel.videos}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500">{channel.lastFetched}</td>
-                    <td className="px-4 py-3 text-right">
-                      <Link
-                        href={`/channels/${channel.id}/videos`}
-                        className="text-sm font-semibold text-youtube-red transition hover:text-red-600"
-                      >
-                        動画一覧
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="grid gap-8 grid-cols-1 md:grid-cols-2">
+            {channels.map((channel) => (
+              <div key={channel.id} className="channel-card">
+                <div className="channel-inner">
+                  <Link
+                    href={`/channels/${channel.id}`}
+                    className="channel-title block transition hover:text-youtube-red"
+                  >
+                    {channel.name}
+                  </Link>
+                  <div className="channel-stats">
+                    <div className="channel-stat">
+                      <span className="icon">
+                        <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M0 0h24v24H0z" fill="none"></path>
+                          <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                        </svg>
+                      </span>
+                      <span>登録者数: <strong>{channel.subscribers}</strong></span>
+                    </div>
+                    <div className="channel-stat">
+                      <span className="icon">
+                        <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M0 0h24v24H0z" fill="none"></path>
+                          <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                        </svg>
+                      </span>
+                      <span>総再生回数: <strong>{channel.totalViews}</strong></span>
+                    </div>
+                    <div className="channel-stat">
+                      <span className="icon">
+                        <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M0 0h24v24H0z" fill="none"></path>
+                          <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                        </svg>
+                      </span>
+                      <span>動画数: <strong>{channel.videos}</strong></span>
+                    </div>
+                    <div className="channel-stat">
+                      <span className="text-xs text-gray-500">最終取得: {channel.lastFetched}</span>
+                    </div>
+                  </div>
+                  <div className="card-action mt-4">
+                    <Link
+                      href={`/channels/${channel.id}/videos`}
+                      className="card-button text-center"
+                    >
+                      動画一覧を見る
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </section>

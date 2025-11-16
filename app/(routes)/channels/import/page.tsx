@@ -57,7 +57,6 @@ export default function ChannelImportPage() {
   return (
     <div className="space-y-8">
       <header className="space-y-3">
-        <p className="text-sm uppercase tracking-wide text-gray-500">channels / import</p>
         <h1 className="text-2xl font-semibold text-gray-900">チャンネルを取り込む</h1>
         <p className="text-sm text-gray-500">
           バックエンドで用意された API を利用してチャンネル情報を取り込みます。URL または ID を入力し、取り込みボタンを押すだけで
@@ -65,46 +64,49 @@ export default function ChannelImportPage() {
         </p>
       </header>
 
-      <section className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="channelInput" className="text-sm font-semibold text-gray-800">
-              チャンネル URL / ID
-            </label>
-            <input
-              id="channelInput"
-              type="text"
-              value={channelUrlOrId}
-              onChange={(e) => setChannelUrlOrId(e.target.value)}
-              placeholder="https://www.youtube.com/@example または UCxxxx"
-              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-youtube-red focus:outline-none focus:ring-2 focus:ring-youtube-red/20 disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={isLoading}
-            />
-          </div>
-          {error && (
-            <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
-              {error}
+      <section className="modern-card">
+        <div className="card-inner">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="channelInput" className="text-sm font-semibold text-gray-800">
+                チャンネル URL / ID
+              </label>
+              <input
+                id="channelInput"
+                type="text"
+                value={channelUrlOrId}
+                onChange={(e) => setChannelUrlOrId(e.target.value)}
+                placeholder="https://www.youtube.com/@example または UCxxxx"
+                className="glass-input-form w-full border border-white/30 bg-white/40 backdrop-blur-md text-sm text-gray-800 placeholder:text-gray-500/70 shadow-inner focus:border-white/50 focus:bg-white/60 focus:outline-none focus:ring-2 focus:ring-white/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                disabled={isLoading}
+              />
             </div>
-          )}
-          <div className="mt-6 flex flex-wrap gap-3">
-            <button
-              type="submit"
-              disabled={isLoading || !channelUrlOrId.trim()}
-              className="inline-flex items-center justify-center rounded-full bg-youtube-red px-5 py-2 text-sm font-semibold text-white transition hover:bg-red-600 disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {isLoading ? "取り込み中..." : "取り込み"}
-            </button>
-            <Link
-              href="/channels"
-              className="inline-flex items-center justify-center rounded-full border border-gray-200 px-5 py-2 text-sm font-semibold text-gray-700 transition hover:border-youtube-red hover:text-youtube-red"
-            >
-              チャンネル一覧を見る
-            </Link>
-          </div>
-        </form>
+            {error && (
+              <div className="rounded-2xl bg-red-50 p-3 text-sm text-red-600">
+                {error}
+              </div>
+            )}
+            <div className="mt-6 flex flex-wrap gap-3">
+              <button
+                type="submit"
+                disabled={isLoading || !channelUrlOrId.trim()}
+                className="btn-glass-primary disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {isLoading ? "取り込み中..." : "取り込み"}
+              </button>
+              <Link
+                href="/channels"
+                className="btn-glass"
+              >
+                チャンネル一覧を見る
+              </Link>
+            </div>
+          </form>
+        </div>
       </section>
 
-      <section className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+      <section className="modern-card">
+        <div className="card-inner">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">最近登録されたチャンネル</h2>
@@ -122,9 +124,9 @@ export default function ChannelImportPage() {
             <p className="text-sm text-gray-500">読み込み中...</p>
           </div>
         ) : channelsError ? (
-          <div className="mt-6 p-6 rounded-lg bg-red-50 border border-red-200">
+          <div className="mt-6 p-6 rounded-2xl bg-red-50 border border-red-200">
             <p className="text-sm font-semibold text-red-800 mb-2">エラーが発生しました</p>
-            <pre className="text-xs text-red-700 whitespace-pre-wrap break-words bg-red-100 p-3 rounded border border-red-200">
+            <pre className="text-xs text-red-700 whitespace-pre-wrap break-words bg-red-100 p-3 rounded-2xl border border-red-200">
               {channelsError}
             </pre>
             <div className="mt-4 space-y-2 text-left text-xs text-gray-600">
@@ -142,36 +144,51 @@ export default function ChannelImportPage() {
             <p className="text-sm text-gray-500">登録済みのチャンネルがありません</p>
           </div>
         ) : (
-          <div className="mt-6 overflow-hidden rounded-xl border border-gray-100">
-            <table className="min-w-full divide-y divide-gray-100 text-sm">
-              <thead className="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                <tr>
-                  <th className="px-4 py-3">チャンネル</th>
-                  <th className="px-4 py-3">登録者数</th>
-                  <th className="px-4 py-3">総再生回数</th>
-                  <th className="px-4 py-3">動画数</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 bg-white text-gray-700">
-                {recentChannels.map((channel) => (
-                  <tr key={channel.id}>
-                    <td className="px-4 py-3">
-                      <Link
-                        href={`/channels/${channel.id}`}
-                        className="font-semibold text-gray-900 transition hover:text-youtube-red"
-                      >
-                        {channel.name}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3">{channel.subscribers}</td>
-                    <td className="px-4 py-3">{channel.totalViews}</td>
-                    <td className="px-4 py-3">{channel.videos}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="mt-6 grid gap-8 grid-cols-1 md:grid-cols-2">
+            {recentChannels.map((channel) => (
+              <div key={channel.id} className="channel-card">
+                <div className="channel-inner">
+                  <Link
+                    href={`/channels/${channel.id}`}
+                    className="channel-title block transition hover:text-youtube-red"
+                  >
+                    {channel.name}
+                  </Link>
+                  <div className="channel-stats">
+                    <div className="channel-stat">
+                      <span className="icon">
+                        <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M0 0h24v24H0z" fill="none"></path>
+                          <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                        </svg>
+                      </span>
+                      <span>登録者数: <strong>{channel.subscribers}</strong></span>
+                    </div>
+                    <div className="channel-stat">
+                      <span className="icon">
+                        <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M0 0h24v24H0z" fill="none"></path>
+                          <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                        </svg>
+                      </span>
+                      <span>総再生回数: <strong>{channel.totalViews}</strong></span>
+                    </div>
+                    <div className="channel-stat">
+                      <span className="icon">
+                        <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M0 0h24v24H0z" fill="none"></path>
+                          <path fill="currentColor" d="M10 15.172l9.192-9.193 1.415 1.414L10 18l-6.364-6.364 1.414-1.414z"></path>
+                        </svg>
+                      </span>
+                      <span>動画数: <strong>{channel.videos}</strong></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
+        </div>
       </section>
     </div>
   );
