@@ -9,7 +9,8 @@ import type { PageProps } from "@/types/page";
 import type { VideoListItem } from "@/types/video";
 
 export default function ChannelVideosPage({ params }: PageProps) {
-  const channelId = parseInt(params.id, 10);
+  const [channelId, setChannelId] = useState<number | null>(null);
+  const [channelIdString, setChannelIdString] = useState<string>("");
   const [videos, setVideos] = useState<VideoListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +19,22 @@ export default function ChannelVideosPage({ params }: PageProps) {
   const [toDate, setToDate] = useState("");
   const [minViews, setMinViews] = useState("");
 
+  // paramsがPromiseの場合は解決してからchannelIdを設定
   useEffect(() => {
+    const resolveParams = async () => {
+      const resolvedParams = params instanceof Promise ? await params : params;
+      const id = parseInt(resolvedParams.id, 10);
+      setChannelId(id);
+      setChannelIdString(resolvedParams.id);
+    };
+    resolveParams();
+  }, [params]);
+
+  useEffect(() => {
+    if (channelId === null) {
+      return;
+    }
+
     if (isNaN(channelId)) {
       setError("無効なチャンネルIDです");
       setIsLoading(false);
@@ -64,14 +80,14 @@ export default function ChannelVideosPage({ params }: PageProps) {
   return (
     <div className="space-y-8">
       <header className="space-y-3">
-        <p className="text-sm uppercase tracking-wide text-gray-500">channels / {params.id} / videos</p>
+        <p className="text-sm uppercase tracking-wide text-gray-500">channels / {channelIdString} / videos</p>
         <h1 className="text-2xl font-semibold text-gray-900">動画一覧</h1>
         <p className="text-sm text-gray-500">
           バックエンドの `getChannelVideos` API を使用して動画一覧を表示します。ソートやフィルター機能も利用できます。
         </p>
         <div className="flex flex-wrap gap-3">
           <Link
-            href={`/channels/${params.id}`}
+            href={`/channels/${channelIdString}`}
             className="inline-flex items-center justify-center rounded-full border border-gray-200 px-5 py-2 text-sm font-semibold text-gray-700 transition hover:border-youtube-red hover:text-youtube-red"
           >
             チャンネル詳細に戻る

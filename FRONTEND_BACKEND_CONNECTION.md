@@ -1150,6 +1150,141 @@ aws apigatewayv2 create-deployment \
 - [Next.js Environment Variables](https://nextjs.org/docs/app/building-your-application/configuring/environment-variables)
 - [API Gateway HTTP API CORS](https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/http-api-cors.html)
 
+### 6.12 チャンネル取り込み時に「チャンネルID抽出に失敗しました」エラー（400 Bad Request）
+
+**症状**: 
+- チャンネルを取り込もうとすると、400 Bad Requestエラーが発生する
+- エラーメッセージ: "チャンネルID抽出に失敗しました"
+- リクエストURL: `https://{api-id}.execute-api.{region}.amazonaws.com/{stage}/channels/import`
+- リクエストメソッド: `POST`
+
+**原因**:
+- リクエストボディが正しく取得できていない
+- `channelUrlOrId`が`None`または空文字列になっている
+- PayloadFormatVersion 2.0でのリクエストボディの処理が正しくない
+- `extract_channel_id`関数が`None`を返している
+
+**確認方法（AWS CLI）**:
+
+1. **Lambda関数のログを確認**:
+   ```bash
+   aws logs filter-log-events \
+     --log-group-name /aws/lambda/youtube-dashboard-channel-import \
+     --region ap-northeast-1 \
+     --start-time $(($(date +%s) - 300)) \
+     --query 'events[*].message' \
+     --output text | grep -E "Request received|channelUrlOrId|Failed to extract|body"
+   ```
+
+2. **PayloadFormatVersionを確認**:
+   ```bash
+   aws apigatewayv2 get-integration \
+     --api-id {api-id} \
+     --integration-id {integration-id} \
+     --region ap-northeast-1 \
+     --query 'PayloadFormatVersion' \
+     --output text
+   ```
+
+3. **実際のリクエストを送信して確認**:
+   ```bash
+   curl -X POST "https://{api-id}.execute-api.{region}.amazonaws.com/{stage}/channels/import" \
+     -H "Content-Type: application/json" \
+     -H "Origin: http://localhost:3000" \
+     -d '{"channelUrlOrId":"UC_x5XG1OV2P6uZZ5FSM9Ttw"}' \
+     -v
+   ```
+
+**対処法**:
+
+#### 方法1: Lambda関数のコードを修正
+
+PayloadFormatVersion 2.0では、リクエストボディは文字列として渡されます。`isBase64Encoded`フラグでBase64エンコードされているかどうかを判定する必要があります。
+
+```python
+# PayloadFormatVersion 2.0の場合、bodyは文字列として渡される
+# isBase64EncodedフラグでBase64エンコードされているかどうかを判定
+body_str = event.get("body", "{}")
+is_base64_encoded = event.get("isBase64Encoded", False)
+
+# Base64エンコードされている場合はデコード
+if is_base64_encoded and isinstance(body_str, str) and body_str:
+    import base64
+    decoded_body = base64.b64decode(body_str).decode('utf-8')
+    body = json.loads(decoded_body)
+elif isinstance(body_str, str) and body_str:
+    # 通常のJSONパース
+    body = json.loads(body_str)
+else:
+    body = {}
+
+channel_url_or_id = body.get("channelUrlOrId")
+```
+
+#### 方法2: ログを追加してデバッグ
+
+Lambda関数にログを追加して、実際のリクエストボディと`channelUrlOrId`の値を確認します。
+
+```python
+logger.info("Request body info", extra={
+    "body_type": type(body_str).__name__,
+    "is_base64_encoded": is_base64_encoded,
+    "body_preview": str(body_str)[:200] if body_str else "empty"
+})
+
+logger.info("Request received", extra={
+    "channelUrlOrId": channel_url_or_id,
+    "body_keys": list(body.keys())
+})
+```
+
+#### 方法3: `extract_channel_id`関数を確認
+
+`extract_channel_id`関数が正しく動作しているか確認します。チャンネルIDが24文字で「UC」で始まる場合のみ返すようになっています。
+
+```python
+def extract_channel_id(channel_url_or_id: str) -> Optional[str]:
+    if not channel_url_or_id:
+        return None
+
+    channel_url_or_id = channel_url_or_id.strip()
+
+    # 24文字で「UC」で始まる場合はそのまま返す
+    if channel_url_or_id.startswith("UC") and len(channel_url_or_id) == 24:
+        return channel_url_or_id
+
+    # URLからチャンネルIDを抽出
+    patterns = [
+        r"youtube\.com/channel/([a-zA-Z0-9_-]{24})",
+        r"youtube\.com/c/([a-zA-Z0-9_-]+)",
+        r"youtube\.com/@([a-zA-Z0-9_-]+)",
+        r"youtube\.com/user/([a-zA-Z0-9_-]+)",
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, channel_url_or_id)
+        if match:
+            channel_id = match.group(1)
+            if channel_id.startswith("UC") and len(channel_id) == 24:
+                return channel_id
+
+    return None
+```
+
+**今回の問題の原因**:
+- PayloadFormatVersion 2.0でのリクエストボディの処理が正しくない可能性
+- `channelUrlOrId`が正しく取得できていない可能性
+- `extract_channel_id`関数が`None`を返している可能性
+
+**学習ポイント**:
+- API Gateway HTTP APIのPayloadFormatVersion 2.0では、リクエストボディは文字列として渡される
+- `isBase64Encoded`フラグでBase64エンコードされているかどうかを判定する必要がある
+- Lambda関数にログを追加して、実際のリクエストボディと値を確認することが重要
+- `extract_channel_id`関数は、チャンネルIDが24文字で「UC」で始まる場合のみ返す
+
+**参考リンク**:
+- [API Gateway HTTP API Payload Format Version 2.0](https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html#http-api-develop-integrations-lambda.proxy-format)
+
 ---
 
 ## 7. 次のステップ

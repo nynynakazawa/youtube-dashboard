@@ -15,6 +15,38 @@ class YouTubeClient:
         self.api_key = api_key
         logger.debug("YouTubeClient initialized")
 
+    def get_channel_id_from_handle(self, handle: str) -> str:
+        """ハンドル名（@で始まる）からチャンネルIDを取得"""
+        logger.info("Fetching channel ID from handle", extra={"handle": handle})
+        # ハンドル名から@を除去
+        handle_clean = handle.lstrip("@")
+        
+        params = {
+            "part": "id",
+            "forHandle": handle_clean,
+            "key": self.api_key,
+        }
+        try:
+            logger.info("Sending request to YouTube API", extra={"url": f"{BASE_URL}/channels", "handle": handle_clean})
+            response = requests.get(f"{BASE_URL}/channels", params=params, timeout=10)
+            logger.info("YouTube API response received", extra={"status_code": response.status_code, "handle": handle_clean})
+            response.raise_for_status()
+            data = response.json()
+
+            if not data.get("items"):
+                logger.warning("Channel not found for handle", extra={"handle": handle_clean})
+                raise ValueError(f"Channel not found for handle: {handle_clean}")
+
+            channel_id = data["items"][0]["id"]
+            logger.info("Channel ID fetched from handle", extra={"handle": handle_clean, "channel_id": channel_id})
+            return channel_id
+        except requests.exceptions.Timeout as e:
+            logger.error("YouTube API request timed out", extra={"handle": handle_clean, "error": str(e)}, exc_info=True)
+            raise ValueError(f"YouTube API request timed out for handle: {handle_clean}") from e
+        except requests.exceptions.RequestException as e:
+            logger.error("YouTube API request failed", extra={"handle": handle_clean, "error": str(e)}, exc_info=True)
+            raise ValueError(f"YouTube API request failed for handle: {handle_clean}: {str(e)}") from e
+
     def get_channel_info(self, channel_id: str) -> Dict[str, Any]:
         logger.info("Fetching channel info from YouTube API", extra={"channel_id": channel_id})
         params = {
@@ -22,7 +54,7 @@ class YouTubeClient:
             "id": channel_id,
             "key": self.api_key,
         }
-        response = requests.get(f"{BASE_URL}/channels", params=params)
+        response = requests.get(f"{BASE_URL}/channels", params=params, timeout=10)
         logger.debug("YouTube API response", extra={"status_code": response.status_code})
         response.raise_for_status()
         data = response.json()
@@ -67,7 +99,7 @@ class YouTubeClient:
                 params["pageToken"] = next_page_token
 
             logger.debug("Fetching playlist items page", extra={"page": page_count, "playlist_id": upload_playlist_id})
-            response = requests.get(f"{BASE_URL}/playlistItems", params=params)
+            response = requests.get(f"{BASE_URL}/playlistItems", params=params, timeout=10)
             logger.debug("Playlist items API response", extra={"status_code": response.status_code})
             response.raise_for_status()
             data = response.json()
@@ -94,7 +126,7 @@ class YouTubeClient:
             "key": self.api_key,
         }
 
-        response = requests.get(f"{BASE_URL}/videos", params=params)
+        response = requests.get(f"{BASE_URL}/videos", params=params, timeout=10)
         logger.debug("Videos API response", extra={"status_code": response.status_code, "chunk": chunk_idx})
         response.raise_for_status()
         data = response.json()

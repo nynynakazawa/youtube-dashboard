@@ -1,15 +1,21 @@
 import Link from "next/link";
 
-import { getChannel } from "@/lib/api";
+import { getChannel, getChannelVideos } from "@/lib/api";
 import { formatNumber } from "@/utils/format";
+import TopVideosChart from "@/components/features/charts/TopVideosChart";
+import MonthlyViewsChart from "@/components/features/charts/MonthlyViewsChart";
 import type { PageProps } from "@/types/page";
 import type { ChannelMetric } from "@/types/dashboard";
+import type { Video } from "@/types/video";
 
 export default async function ChannelDetailPage({ params }: PageProps) {
-  const channelId = parseInt(params.id, 10);
-  let channelName = `Channel: ${params.id}`;
+  // Next.js 15ではparamsがPromiseになる可能性があるため、awaitする
+  const resolvedParams = await params;
+  const channelId = parseInt(resolvedParams.id, 10);
+  let channelName = `Channel: ${resolvedParams.id}`;
   let metrics: ChannelMetric[] = [];
   let error: string | null = null;
+  let videos: Video[] = [];
 
   if (isNaN(channelId)) {
     error = "無効なチャンネルIDです";
@@ -34,6 +40,15 @@ export default async function ChannelDetailPage({ params }: PageProps) {
           delta: "-",
         },
       ];
+
+      // グラフ用に動画データを取得
+      try {
+        const videosResponse = await getChannelVideos(channelId, { sort: "views_desc", limit: 100 });
+        videos = videosResponse.items;
+      } catch (videoErr) {
+        // 動画データの取得に失敗してもエラーにはしない（グラフを表示しないだけ）
+        console.error("動画データの取得に失敗しました:", videoErr);
+      }
     } catch (err) {
       error = err instanceof Error ? err.message : "チャンネル情報の取得に失敗しました";
     }
@@ -42,14 +57,14 @@ export default async function ChannelDetailPage({ params }: PageProps) {
   return (
     <div className="space-y-8">
       <header className="space-y-3">
-        <p className="text-sm uppercase tracking-wide text-gray-500">channels / {params.id}</p>
+        <p className="text-sm uppercase tracking-wide text-gray-500">channels / {resolvedParams.id}</p>
         <h1 className="text-2xl font-semibold text-gray-900">{channelName}</h1>
         <p className="text-sm text-gray-500">
           ここではバックエンドから取得したチャンネルサマリを表示します。
         </p>
         <div className="flex flex-wrap gap-3">
           <Link
-            href={`/channels/${params.id}/videos`}
+            href={`/channels/${resolvedParams.id}/videos`}
             className="inline-flex items-center justify-center rounded-full bg-youtube-red px-5 py-2 text-sm font-semibold text-white transition hover:bg-red-600"
           >
             動画一覧を開く
@@ -82,18 +97,29 @@ export default async function ChannelDetailPage({ params }: PageProps) {
       )}
 
       <section className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900">視聴動向（モック）</h2>
-            <p className="text-sm text-gray-500">
-              Recharts でグラフを描画する予定のプレースホルダーです。バックエンドの `/stats/summary` エンドポイントと接続します。
-            </p>
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-gray-900">視聴動向</h2>
+          <p className="mt-1 text-sm text-gray-500">
+            チャンネルの動画データを可視化しています。
+          </p>
+        </div>
+
+        {videos.length > 0 ? (
+          <div className="space-y-8">
+            <div>
+              <h3 className="mb-4 text-base font-semibold text-gray-900">再生数トップ10</h3>
+              <TopVideosChart videos={videos} />
+            </div>
+            <div>
+              <h3 className="mb-4 text-base font-semibold text-gray-900">月別総再生数推移</h3>
+              <MonthlyViewsChart videos={videos} />
+            </div>
           </div>
-          <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-500">準備中</span>
-        </div>
-        <div className="mt-6 rounded-xl border border-dashed border-gray-200 bg-gray-50 p-6 text-center text-sm text-gray-500">
-          グラフコンポーネントがここに入ります。データモデルが整い次第、TopVideosChart / MonthlyViewsChart を配置してください。
-        </div>
+        ) : (
+          <div className="flex h-64 items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50 text-sm text-gray-500">
+            動画データがありません
+          </div>
+        )}
       </section>
     </div>
   );
