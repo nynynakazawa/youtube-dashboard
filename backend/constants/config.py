@@ -9,3 +9,4 @@ DB_NAME: Optional[str] = os.getenv("DB_NAME")
 MIN_FETCH_INTERVAL: int = int(os.getenv("MIN_FETCH_INTERVAL", "600"))
 DYNAMODB_TABLE_NAME: str = os.getenv("DYNAMODB_TABLE_NAME", "channel_update_cache")
 
+

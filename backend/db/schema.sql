@@ -41,3 +41,4 @@ CREATE TABLE video_stats_history (
   INDEX idx_video_snapshot (video_id, snapshot_at)
 );
 
+

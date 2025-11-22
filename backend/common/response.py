@@ -25,3 +25,4 @@ def error_response(error_code: str, message: str, status_code: int = 500) -> Dic
         ),
     }
 
+
